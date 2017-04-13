@@ -9,8 +9,8 @@ password: sameas
 
 
 Structure of DB: https://github.com/firmao/linklion2/blob/master/DB_Tables_StoredProcedure.sql
-Main class: https://gi
-thub.com/firmao/linklion2/blob/master/LinkLion2_p1_Alternative.java
+
+Main class: https://github.com/firmao/linklion2/blob/master/LinkLion2_p1_Alternative.java
 
 JDK version 1.8
 External java libraries: Jena and Java mail.
