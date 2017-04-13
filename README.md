@@ -2,10 +2,12 @@
 Second version of LinkLion
 
 DataBase type: MySQL
-DataBase name: linklion2
-username: root
-password: sameas
 
+DataBase name: linklion2
+
+username: root
+
+password: sameas
 
 
 Structure of DB: https://github.com/firmao/linklion2/blob/master/DB_Tables_StoredProcedure.sql
