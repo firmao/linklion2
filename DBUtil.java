@@ -1,9 +1,10 @@
-package servlets;
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -11,136 +12,127 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.naming.Context;
+
 public class DBUtil {
-
-	private static Connection connGeneric;
-
-	// Select name, countDType from dataset2, uri2 where indexDataset=indDS and
-	// uri='http://www.w3.org/2000/01/rdf-schema#Literal';
-	public static Map<String, Integer> findEndPoint(String uri) {
-		Map<String, Integer> result = new HashMap<String, Integer>();
-		ResultSet rs = null;
-		PreparedStatement ps = null;
-		try {
-			Connection connection = getSQLConnection();
-			ps = connection.prepareStatement(
-					"Select name, countDType from dataset2, uri2 where indexDataset=indDS and uri = ?");
-			ps.setString(1, uri);
-			rs = ps.executeQuery();
-			while (rs.next()) {
-				String endPoint = rs.getString("name");
-				int countDType = rs.getInt("countDType");
-				result.put(endPoint, countDType);
-			}
-		} catch (Exception ex) {
-			Logger lgr = Logger.getLogger(DBUtil.class.getName());
-			lgr.log(Level.SEVERE, ex.getMessage(), ex);
-
-		} finally {
-			try {
-				if (rs != null) {
-					rs.close();
-				}
-				if (ps != null) {
-					ps.close();
-				}
-				// if (conn != null) {
-				// conn.close();
-				// }
-
-			} catch (SQLException ex) {
-				Logger lgr = Logger.getLogger(DBUtil.class.getName());
-				lgr.log(Level.WARNING, ex.getMessage(), ex);
-			}
-		}
-		return result;
-	}
-
-	/*
-	 * Select sum(countDType), count(uri) from uri2 
-	 * where indexDataset=(Select indDS from dataset2 
-	 * where name='http://crm.rkbexplorer.com/sparql') group by countDType;
-	 */
-	public static Map<Integer, Integer> findURI(String endPoint){
+	static Connection connGeneric;
+	static Map<String, Integer> mDatasetIndex = new HashMap<String, Integer>();
+	public static Connection getConnection() throws ClassNotFoundException, SQLException
+	{
+//		ctx = new InitialContext();
+//
+//		DataSource ds = (DataSource) ctx.lookup("java:comp/env/jdbc/mysql");
+//
+//		if (ds != null) return ds.getConnection();
 		
-		return null;
+		Class.forName("com.mysql.jdbc.Driver");
+		//return DriverManager.getConnection("jdbc:mysql://db4free.net/dbsameas?" +
+        //        "user=firmao&password=sameas");
+        //return DriverManager.getConnection("jdbc:mysql://127.0.0.1/linklion2?" +
+        //                "user=root&password=sameas");        
+        if(connGeneric != null)
+        	return connGeneric;
+        else{
+        	//connGeneric = DriverManager.getConnection("jdbc:mysql://139.18.8.63/linklion2?" +
+            //       "user=root&password=sameas");
+        	connGeneric = DriverManager.getConnection("jdbc:mysql://127.0.0.1/linklion2?" +
+                    "user=root&password=sameas");
+        	return connGeneric;
+        }
+	}
+	
+	public static void setAutoCommit(boolean value) {
+		try {
+			getConnection().setAutoCommit(value);
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	/*
-	 * Select uri, countDType from uri2 where indexDataset=(Select indDS from dataset2 where name='http://crm.rkbexplorer.com/sparql');
+	 * Table Dataset(int index, string Name)
+	 * Table URI(int index, string uri, int indDataset)
+	 * @DataSetName = Name of the EndPoint
 	 */
-	public static Map<String, Integer> findAllURIDataTypes(String endPoint){
-		Map<String, Integer> result = new HashMap<String, Integer>();
-		ResultSet rs = null;
-		PreparedStatement ps = null;
+	public static void insert(String dataSetName, String subjURI, Integer count){
+		Connection conn = null;
+		Context ctx;
 		try {
-			Connection connection = getSQLConnection();
-			ps = connection.prepareStatement(
-					"Select uri, countDType from uri2 where indexDataset=(Select indDS from dataset2 where name = ?)");
-			ps.setString(1, endPoint);
-			rs = ps.executeQuery();
-			while (rs.next()) {
-				String uri = rs.getString("uri");
-				int countDType = rs.getInt("countDType");
-				result.put(uri, countDType);
+			conn = getConnection();
+			int indDataSet =  0;
+			if (mDatasetIndex.containsKey(dataSetName)){
+				indDataSet = mDatasetIndex.get(dataSetName);
+			}else{
+				indDataSet = getLastIndex(conn, "dataset2", "indDS") + 1;
+				
+				PreparedStatement prep = conn
+						.prepareStatement("INSERT INTO linklion2.dataset2 (indDS, name) VALUES (?,?);");
+				prep.setInt(1, indDataSet);
+				prep.setString(2, dataSetName.trim());
+	
+				prep.executeUpdate();
+				mDatasetIndex.put(dataSetName, indDataSet);
 			}
-		} catch (Exception ex) {
-			Logger lgr = Logger.getLogger(DBUtil.class.getName());
-			lgr.log(Level.SEVERE, ex.getMessage(), ex);
+			int indURI = getLastIndex(conn, "uri2", "indURI") + 1;
+			PreparedStatement prep2 = conn
+					.prepareStatement("INSERT INTO linklion2.uri2 (indURI, uri, indexDataset, countDType) VALUES (?, ?, ?, ?);");
+			prep2.setInt(1, indURI);
+			prep2.setString(2, subjURI.trim());
+			prep2.setInt(3, indDataSet);
+			prep2.setInt(4, count);
+
+			prep2.executeUpdate();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public static void insert(String subj, String endPoint) throws ClassNotFoundException, SQLException {
+		Connection dbConnection = getConnection();
+		CallableStatement callableStatement = null;
+
+		String insertStoreProc = "{call ADD_DB(?,?)}";
+
+		try {
+			callableStatement = dbConnection.prepareCall(insertStoreProc);
+
+			callableStatement.setString(1, subj);
+			callableStatement.setString(2, endPoint);
+
+			callableStatement.executeUpdate();
+
+		} catch (SQLException e) {
+
+			System.err.println(e.getMessage());
 
 		} finally {
-			try {
-				if (rs != null) {
-					rs.close();
-				}
-				if (ps != null) {
-					ps.close();
-				}
-				// if (conn != null) {
-				// conn.close();
-				// }
 
-			} catch (SQLException ex) {
-				Logger lgr = Logger.getLogger(DBUtil.class.getName());
-				lgr.log(Level.WARNING, ex.getMessage(), ex);
+			if (callableStatement != null) {
+				callableStatement.close();
 			}
+
 		}
-		return result;
+
 	}
 	
-	private static Connection getSQLConnection() throws ClassNotFoundException, SQLException {
-		Class.forName("com.mysql.jdbc.Driver");
-		// return
-		// DriverManager.getConnection("jdbc:mysql://db4free.net/dbsameas?" +
-		// "user=firmao&password=sameas");
-		// return
-		// DriverManager.getConnection("jdbc:mysql://127.0.0.1/linklion2?" +
-		// "user=root&password=sameas");
-		if (connGeneric != null)
-			return connGeneric;
-		else {
-			// connGeneric =
-			// DriverManager.getConnection("jdbc:mysql://139.18.8.63/linklion2?"
-			// +
-			// "user=root&password=sameas");
-			connGeneric = DriverManager
-					.getConnection("jdbc:mysql://127.0.0.1/linklion2?" + "user=root&password=sameas");
-			return connGeneric;
-		}
-	}
-
-	public static Set<String> sendSQL(String sql) {
-		HashSet<String> result = new HashSet<String>();
+	private static int getLastIndex(Connection conn, String table, String sNameInd) {
+		int iRet = 0;
+		Statement st = null;
 		ResultSet rs = null;
-		PreparedStatement ps = null;
+
 		try {
-			Connection connection = getSQLConnection();
-			ps = connection.prepareStatement(sql);
-			rs = ps.executeQuery();
+			st = conn.createStatement();
+			String sQuery = "Select MAX("+sNameInd+") as ind from linklion2." + table + ";";
+			rs = st.executeQuery(sQuery);
 			while (rs.next()) {
-				String res = rs.getString(1) + "\t" + rs.getString(2);
-				result.add(res);
+				iRet = rs.getInt(1);
 			}
+
 		} catch (Exception ex) {
 			Logger lgr = Logger.getLogger(DBUtil.class.getName());
 			lgr.log(Level.SEVERE, ex.getMessage(), ex);
@@ -150,18 +142,24 @@ public class DBUtil {
 				if (rs != null) {
 					rs.close();
 				}
-				if (ps != null) {
-					ps.close();
+				if (st != null) {
+					st.close();
 				}
-				// if (conn != null) {
-				// conn.close();
-				// }
+				//if (conn != null) {
+				//	conn.close();
+				//}
 
 			} catch (SQLException ex) {
 				Logger lgr = Logger.getLogger(DBUtil.class.getName());
 				lgr.log(Level.WARNING, ex.getMessage(), ex);
 			}
 		}
-		return result;
+
+		return iRet;
 	}
+	
+	public static void main(String args[]){
+		insert("DatasetTest", "http://fdsa.rew.fds", 3);
+	}
+	
 }
