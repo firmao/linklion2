@@ -91,7 +91,24 @@ public class Find extends HttpServlet {
 	}
 
 	private void findSQL(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		response.getOutputStream().println("<h1>Not implemented yet</h1>");
+		String sql = request.getParameter("SQL");
+		sql = sql.replaceAll("123nada", "#").trim(); // to solve some problems with QueryString.
+		request.getSession().setAttribute("sql", sql);
+		
+		Set<String> result = DBUtil.sendSQL(sql);
+
+		if((result != null) && (result.size() > 0))
+		{
+			String json = "[";
+			for (String elem : result) {
+				json += ",{ \"elem\":\""+ elem + "\"}";
+			}
+			json = json.replaceFirst(",", "");
+			json += "]";
+			response.getOutputStream().println(json);
+		}else{
+			response.getOutputStream().println("<h1>NOTHING !</h1>");
+		}
 		
 	}
 
