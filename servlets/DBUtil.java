@@ -138,7 +138,14 @@ public class DBUtil {
 			ps = connection.prepareStatement(sql);
 			rs = ps.executeQuery();
 			while (rs.next()) {
-				String res = rs.getString(1) + "\t" + rs.getString(2);
+				//String res = rs.getString(1) + "\t" + rs.getString(2);
+				String res = "";
+				try{
+					int i=1;
+					while(true){
+						res += "\t" + rs.getString(i++);
+					}
+				}catch(Exception e){}
 				result.add(res);
 			}
 		} catch (Exception ex) {
