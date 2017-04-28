@@ -17,8 +17,12 @@ Main class: https://github.com/firmao/linklion2/blob/master/LinkLion2_p1_Alterna
 JDK version 1.8
 External java libraries: Jena and Java mail.
 
+Database: https://www.dropbox.com/s/2m3hibbry6c51w5/backup_linklion2.sql?dl=0
+
 Restore Database:
+
 mysql -u root -p linklion2 < backup_linklion2.sql
 
 Backup Database:
+
 mysqldump -u root -p linklion2 > backup_linklion2.sql
