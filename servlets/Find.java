@@ -48,24 +48,34 @@ public class Find extends HttpServlet {
 
 				if((result != null) && (result.size() > 0))
 				{
-					response.getOutputStream().println("<table border='1'> "
-							+ "<tr> "
-							+ "<th>EndPoint</th> "
-							+ "<th>Count DataType</th> "
-							+ "</tr>");
-					result.entrySet().forEach(elem ->{
+					String json = "[";
+					for (Map.Entry<String, Integer> elem : result.entrySet()) {
 						String endPoint = elem.getKey();
 						int dType = elem.getValue();
-						try {
-							response.getOutputStream().println("<tr> "
-									+ "<td>"+ endPoint +"</td> "
-									+ "<td>"+ dType +"</td> "
-									+ "</tr>");
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-					});
-					response.getOutputStream().println("</table>");
+						json += ",{\"EndPoint\":\""+ endPoint + "\",\"CountDataType\":\""+ dType + "\"}";
+					}
+					json = json.replaceFirst(",", "");
+					json += "]";
+					response.getOutputStream().println(json);
+					
+//					response.getOutputStream().println("<table border='1'> "
+//							+ "<tr> "
+//							+ "<th>EndPoint</th> "
+//							+ "<th>Count DataType</th> "
+//							+ "</tr>");
+//					result.entrySet().forEach(elem ->{
+//						String endPoint = elem.getKey();
+//						int dType = elem.getValue();
+//						try {
+//							response.getOutputStream().println("<tr> "
+//									+ "<td>"+ endPoint +"</td> "
+//									+ "<td>"+ dType +"</td> "
+//									+ "</tr>");
+//						} catch (IOException e) {
+//							e.printStackTrace();
+//						}
+//					});
+//					response.getOutputStream().println("</table>");
 				}else{
 					response.getOutputStream().println("<h1>NOTHING !</h1>");
 				}
