@@ -1,11 +1,15 @@
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
@@ -17,11 +21,13 @@ import com.hp.hpl.jena.query.ResultSet;
 public class FirstOptimization {
 
  	static Map<String, String> mEndPointError = new HashMap<String, String>();
-	public static void main(String[] args) throws ClassNotFoundException, SQLException {
+	public static void main(String[] args) throws ClassNotFoundException, SQLException, IOException {
 		
+		long startTotal = System.currentTimeMillis();
 		System.out.println("Starting get good EndPointsHTML");
 		long start = System.currentTimeMillis();
 		Set<String> endPointsGoodHTML = QueryEndPoints.getGoodEndPoints();
+		//Set<String> endPointsGoodHTML = Files.lines(Paths.get("GoodEndPoints_3.txt")).collect(Collectors.toSet());
 		long totalTime = System.currentTimeMillis() - start;
 		System.out.println("Total time (endPointsGoodHTML): " + totalTime);
 		System.out.println("Number of endPointsGoodHTML: " + endPointsGoodHTML.size());
@@ -43,6 +49,9 @@ public class FirstOptimization {
 		System.out.println("Total time (endPointsFailBruteForce): " + totalTime);
 		System.out.println("Number of endPointsBruteForce: " + endPointsBruteForce.size());
 		System.out.println("Number of endPointsFailBruteForce: " + endPointsFailBruteForce.size());		
+		
+		long totalTimeAll = System.currentTimeMillis() - startTotal;
+		System.out.println("Total time (EVERYTHING): " + totalTimeAll);
 		
 		generateFile(endPointsGoodHTML, "goodHTML.txt");
 		generateFile(endPointsSparql, "spaqlEndPoints.txt");
