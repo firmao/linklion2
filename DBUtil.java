@@ -58,37 +58,62 @@ public class DBUtil {
 	 * Table URI(int index, string uri, int indDataset)
 	 * @DataSetName = Name of the EndPoint
 	 */
-	public static void insert(String dataSetName, String subjURI, Integer count){
-		Connection conn = null;
-		Context ctx;
-		try {
-			conn = getConnection();
-			int indDataSet =  0;
-			if (mDatasetIndex.containsKey(dataSetName)){
-				indDataSet = mDatasetIndex.get(dataSetName);
-			}else{
-				indDataSet = getLastIndex(conn, "dataset2", "indDS") + 1;
-				
-				PreparedStatement prep = conn
-						.prepareStatement("INSERT INTO linklion2.dataset2 (indDS, name) VALUES (?,?);");
-				prep.setInt(1, indDataSet);
-				prep.setString(2, dataSetName.trim());
-	
-				prep.executeUpdate();
-				mDatasetIndex.put(dataSetName, indDataSet);
-			}
-			int indURI = getLastIndex(conn, "uri2", "indURI") + 1;
-			PreparedStatement prep2 = conn
-					.prepareStatement("INSERT INTO linklion2.uri2 (indURI, uri, indexDataset, countDType) VALUES (?, ?, ?, ?);");
-			prep2.setInt(1, indURI);
-			prep2.setString(2, subjURI.trim());
-			prep2.setInt(3, indDataSet);
-			prep2.setInt(4, count);
+	public static void insert(String dataSetName, String subjURI, Integer count) throws ClassNotFoundException, SQLException{
+//		Connection conn = null;
+//		Context ctx;
+//		try {
+//			conn = getConnection();
+//			int indDataSet =  0;
+//			if (mDatasetIndex.containsKey(dataSetName)){
+//				indDataSet = mDatasetIndex.get(dataSetName);
+//			}else{
+//				indDataSet = getLastIndex(conn, "dataset2", "indDS") + 1;
+//				
+//				PreparedStatement prep = conn
+//						.prepareStatement("INSERT INTO linklion2.dataset2 (indDS, name) VALUES (?,?);");
+//				prep.setInt(1, indDataSet);
+//				prep.setString(2, dataSetName.trim());
+//	
+//				prep.executeUpdate();
+//				mDatasetIndex.put(dataSetName, indDataSet);
+//			}
+//			int indURI = getLastIndex(conn, "uri2", "indURI") + 1;
+//			PreparedStatement prep2 = conn
+//					.prepareStatement("INSERT INTO linklion2.uri2 (indURI, uri, indexDataset, countDType) VALUES (?, ?, ?, ?);");
+//			prep2.setInt(1, indURI);
+//			prep2.setString(2, subjURI.trim());
+//			prep2.setInt(3, indDataSet);
+//			prep2.setInt(4, count);
+//
+//			prep2.executeUpdate();
+//		} catch (Exception e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+		Connection dbConnection = getConnection();
+		CallableStatement callableStatement = null;
 
-			prep2.executeUpdate();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		String insertStoreProc = "{call ADD_DB_S(?,?,?)}";
+
+		try {
+			callableStatement = dbConnection.prepareCall(insertStoreProc);
+
+			callableStatement.setString(1, subjURI);
+			callableStatement.setString(2, dataSetName);
+			callableStatement.setInt(3, count);
+
+			callableStatement.executeUpdate();
+
+		} catch (SQLException e) {
+
+			System.err.println(e.getMessage());
+
+		} finally {
+
+			if (callableStatement != null) {
+				callableStatement.close();
+			}
+
 		}
 	}
 
@@ -97,6 +122,7 @@ public class DBUtil {
 		CallableStatement callableStatement = null;
 
 		String insertStoreProc = "{call ADD_DB(?,?)}";
+		//String insertStoreProc = "{call ADD_DB_OLD(?,?)}";
 
 		try {
 			callableStatement = dbConnection.prepareCall(insertStoreProc);
@@ -158,7 +184,7 @@ public class DBUtil {
 		return iRet;
 	}
 	
-	public static void main(String args[]){
+	public static void main(String args[]) throws ClassNotFoundException, SQLException{
 		insert("DatasetTest", "http://fdsa.rew.fds", 3);
 	}
 	
