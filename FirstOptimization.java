@@ -53,11 +53,34 @@ public class FirstOptimization {
 		long totalTimeAll = System.currentTimeMillis() - startTotal;
 		System.out.println("Total time (EVERYTHING): " + totalTimeAll);
 		
+		System.out.println("Trying recover possible redirects...Sparql complex count");
+		Set<String> endPointsRedirectSparql = new HashSet<String>();
+		AnalyseComplexSparql.mEndPointError.forEach((endPoint, error) ->{
+			try {
+				String redirectSparql = QueryEndPoints.getRedirection(endPoint);
+				endPointsRedirectSparql.add(redirectSparql);
+			} catch (IOException e) {
+			}
+		});
+		Set<String> endPointsSparqlRedirect = AnalyseComplexSparql.createDBIndex(endPointsRedirectSparql);
+		
+		System.out.println("Trying recover possible redirects...BruteForce");
+		Set<String> endPointsRedirect = new HashSet<String>();
+		endPointsFailBruteForce.forEach((endPoint, error) ->{
+			try {
+				String redirect = QueryEndPoints.getRedirection(endPoint);
+				endPointsRedirect.add(redirect);
+			} catch (IOException e) {
+			}
+		});
+		Map<String, String> endPointsFailRedirect = createDBIndex(endPointsRedirect);
+		
 		generateFile(endPointsGoodHTML, "goodHTML.txt");
 		generateFile(endPointsSparql, "spaqlEndPoints.txt");
+		generateFile(endPointsSparqlRedirect, "spaqlEndPointsRedirect.txt");
 		generateFile(endPointsBruteForce, "BruteForceEndPoints.txt");
-		generateFile(endPointsFailBruteForce, "FailBruteForceEndPoints.txt");
-		
+		generateFile(endPointsFailBruteForce, "FailBruteForceEndPoints.csv");
+		generateFile(endPointsFailRedirect, "FailRedirectEndPoints.csv");
 	}
 
 	private static Map<String, String> createDBIndex(Set<String> setEndPoints) throws ClassNotFoundException, SQLException {
