@@ -163,7 +163,7 @@ public class LinkLion2_p1_Alternative {
 	 */
 	private static Set<String> getEndPoints(boolean debug) throws IOException {
 		// if (debug)
-		//return Files.lines(Paths.get("GoodEndPoints_2.txt")).collect(Collectors.toSet());
+		//return Files.lines(Paths.get("GoodEndPoints_3.txt")).collect(Collectors.toSet());
 		// else {
 		return QueryEndPoints.getGoodEndPoints();
 		// }
@@ -177,7 +177,12 @@ public class LinkLion2_p1_Alternative {
 			int count = elem.getValue();
 			String dataset = mSubjEndPoint.get(uriSubj); // Dataset = endpoint
 			if (dataset != null) {
-				DBUtil.insert(dataset, uriSubj, count);
+				try {
+					DBUtil.insert(dataset, uriSubj, count);
+				} catch (ClassNotFoundException | SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		});
 		// mSubjCount.forEach((uriSubj, count) -> {
