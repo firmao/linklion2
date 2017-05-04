@@ -14,7 +14,7 @@ import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 
 public class AnalyseComplexSparql {
-	static Map<String, String> mEndPointError = new HashMap<String, String>();
+	public static Map<String, String> mEndPointError = new HashMap<String, String>();
 	static Set<String> setGood = new HashSet<String>();
 
 	public static void main(String args[]) {
