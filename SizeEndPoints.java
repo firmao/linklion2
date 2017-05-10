@@ -24,21 +24,23 @@ public class SizeEndPoints {
 		long start = System.currentTimeMillis();
 		System.out.println("Getting size EndPoints");
 		getSizeEachEndPoint();
+		generateFile(sizes,"EndPointSizes.csv");
+		generateFile(mErrors, "EndPointSizesError.csv", true);
 		System.out.println("Getting size EndPoints with errors/Redirection");
 		getSizeEndPointErrors();
 		long total = System.currentTimeMillis() - start;
 		System.out.println("Total time: = "+total+ "\nWriting files.");
-		generateFile(sizes,"EndPointSizes.csv");
-		generateFile(mErrors, "EndPointSizesError.csv", true);
 		generateFile(mURLRedirected, "EndPointSizesRedirect.csv", true);
 	}
 
 	
 	public static void getSizeEachEndPoint(){
 		setGoodEndPoints = QueryEndPoints.getGoodEndPoints();
+		generateFile(setGoodEndPoints, "GoodEndPoints_size.txt");
 		for (String endPoint : setGoodEndPoints) {
 			int size = getSize(endPoint);
 			sizes.put(endPoint, size);
+			System.out.println("EndPoint: " + endPoint + " size: " + size);
 		}
 	}
 	
@@ -51,6 +53,7 @@ public class SizeEndPoints {
 				if(size > 0){ 
 					sizes.put(urlRedirect, size);
 					mURLRedirected.put(endPoint, urlRedirect);
+					System.out.println("EndPointRedirect: " + endPoint + " size: " + size);
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -116,6 +119,21 @@ public class SizeEndPoints {
 			PrintWriter writer = new PrintWriter(fileName, "UTF-8");
 			endPointSize.forEach((endPoint, error) -> {
 				writer.println(endPoint + "\t" + error);
+			});
+			writer.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return ret;
+	}
+	
+	public static File generateFile(Set<String> endPointErrors, String fileName) {
+		File ret = new File(fileName);
+		try {
+			PrintWriter writer = new PrintWriter(fileName, "UTF-8");
+			endPointErrors.forEach(endPoint -> {
+				writer.println(endPoint);
 			});
 			writer.close();
 		} catch (Exception e) {

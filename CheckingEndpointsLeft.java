@@ -1,22 +1,15 @@
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
-
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.QueryExecutionFactory;
-import com.hp.hpl.jena.query.QueryFactory;
-import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.query.ResultSet;
 
 public class CheckingEndpointsLeft {
 
 	public static void main(String[] args) throws IOException {
 		analyseLog();
+		
+		//Set<String> ret = FirstOptimization.getTriples("http://smartcity.linkeddata.es/BECA/sparql/");
+		//System.out.println(ret);
 	}
 
 	public static void analyseLog() throws IOException{

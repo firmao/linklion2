@@ -39,20 +39,7 @@ public class FirstOptimization {
 		System.out.println("Total time (endPointsSparql): " + totalTime);
 		System.out.println("Number of endPointsSparql: " + endPointsSparql.size());
 		
-		System.out.println("Starting endPoints BruteForce.");
 		start = System.currentTimeMillis();
-		Set<String> endPointsBruteForce = new HashSet<String>();
-		endPointsBruteForce.addAll(endPointsGoodHTML);
-		endPointsBruteForce.removeAll(endPointsSparql);
-		Map<String, String> endPointsFailBruteForce = createDBIndex(endPointsBruteForce);
-		totalTime = System.currentTimeMillis() - start;
-		System.out.println("Total time (endPointsFailBruteForce): " + totalTime);
-		System.out.println("Number of endPointsBruteForce: " + endPointsBruteForce.size());
-		System.out.println("Number of endPointsFailBruteForce: " + endPointsFailBruteForce.size());		
-		
-		long totalTimeAll = System.currentTimeMillis() - startTotal;
-		System.out.println("Total time (EVERYTHING): " + totalTimeAll);
-		
 		System.out.println("Trying recover possible redirects...Sparql complex count");
 		Set<String> endPointsRedirectSparql = new HashSet<String>();
 		AnalyseComplexSparql.mEndPointError.forEach((endPoint, error) ->{
@@ -63,8 +50,24 @@ public class FirstOptimization {
 			}
 		});
 		Set<String> endPointsSparqlRedirect = AnalyseComplexSparql.createDBIndex(endPointsRedirectSparql);
+		totalTime = System.currentTimeMillis() - start;
+		System.out.println("Total time (Recover Redirect endPointsSparql): " + totalTime);
+		System.out.println("Number of endPointsSparqlRedirect: " + endPointsSparqlRedirect.size());
+		
+		System.out.println("Starting endPoints BruteForce.");
+		start = System.currentTimeMillis();
+		Set<String> endPointsBruteForce = new HashSet<String>();
+		endPointsBruteForce.addAll(endPointsGoodHTML);
+		endPointsBruteForce.removeAll(endPointsSparql);
+		endPointsBruteForce.removeAll(endPointsSparqlRedirect);
+		Map<String, String> endPointsFailBruteForce = createDBIndex(endPointsBruteForce);
+		totalTime = System.currentTimeMillis() - start;
+		System.out.println("Total time (endPointsFailBruteForce): " + totalTime);
+		System.out.println("Number of endPointsBruteForce: " + endPointsBruteForce.size());
+		System.out.println("Number of endPointsFailBruteForce: " + endPointsFailBruteForce.size());		
 		
 		System.out.println("Trying recover possible redirects...BruteForce");
+		start = System.currentTimeMillis();
 		Set<String> endPointsRedirect = new HashSet<String>();
 		endPointsFailBruteForce.forEach((endPoint, error) ->{
 			try {
@@ -74,6 +77,12 @@ public class FirstOptimization {
 			}
 		});
 		Map<String, String> endPointsFailRedirect = createDBIndex(endPointsRedirect);
+		totalTime = System.currentTimeMillis() - start;
+		System.out.println("Total time (Redirects Brute Force): " + totalTime);
+		
+		long totalTimeAll = System.currentTimeMillis() - startTotal;
+		System.out.println("Total time (EVERYTHING): " + totalTimeAll);
+		System.out.println("Now writing the files...");
 		
 		generateFile(endPointsGoodHTML, "goodHTML.txt");
 		generateFile(endPointsSparql, "spaqlEndPoints.txt");
@@ -199,7 +208,7 @@ public class FirstOptimization {
 			System.err.println("ALERT !!!! No DB connection!");
 	}
 	
-	private static Set<String> getTriples(String endPoint) {
+	public static Set<String> getTriples(String endPoint) {
 		Set<String> setReturn = new HashSet<String>();
 		String sparqlQueryString = "SELECT * WHERE { ?s ?p ?o }";
 
