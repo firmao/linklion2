@@ -26,3 +26,5 @@ mysql -u root -p linklion2 < backup_linklion2.sql
 Backup Database:
 
 mysqldump -u root -p linklion2 > backup_linklion2.sql
+
+File with examples of URIs belonging to more than one data-set: https://github.com/firmao/linklion2/blob/master/data.csv
