@@ -17,14 +17,14 @@ Main class: https://github.com/firmao/linklion2/blob/master/FirstOptimization.ja
 JDK version 1.8
 External java libraries: Jena and Java mail.
 
-Database: https://www.dropbox.com/s/2m3hibbry6c51w5/backup_linklion2.sql?dl=0
+Database: https://doi.org/10.6084/m9.figshare.5005241.v1
 
 Restore Database:
 
-mysql -u root -p linklion2 < backup_linklion2.sql
+mysql -u root -p linklion2 < file.sql
 
 Backup Database:
 
-mysqldump -u root -p linklion2 > backup_linklion2.sql
+mysqldump -u root -p linklion2 > file.sql
 
 File with examples of URIs belonging to more than one data-set: https://github.com/firmao/linklion2/blob/master/data.csv
