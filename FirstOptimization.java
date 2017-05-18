@@ -31,6 +31,7 @@ public class FirstOptimization {
 		long totalTime = System.currentTimeMillis() - start;
 		System.out.println("Total time (endPointsGoodHTML): " + totalTime);
 		System.out.println("Number of endPointsGoodHTML: " + endPointsGoodHTML.size());
+		generateFile(endPointsGoodHTML, "goodHTML.txt");
 		
 		System.out.println("Starting endpoints sparql count");
 		start = System.currentTimeMillis();
@@ -38,6 +39,7 @@ public class FirstOptimization {
 		totalTime = System.currentTimeMillis() - start;
 		System.out.println("Total time (endPointsSparql): " + totalTime);
 		System.out.println("Number of endPointsSparql: " + endPointsSparql.size());
+		generateFile(endPointsSparql, "spaqlEndPoints.txt");
 		
 		start = System.currentTimeMillis();
 		System.out.println("Trying recover possible redirects...Sparql complex count");
@@ -53,6 +55,7 @@ public class FirstOptimization {
 		totalTime = System.currentTimeMillis() - start;
 		System.out.println("Total time (Recover Redirect endPointsSparql): " + totalTime);
 		System.out.println("Number of endPointsSparqlRedirect: " + endPointsSparqlRedirect.size());
+		generateFile(endPointsSparqlRedirect, "spaqlEndPointsRedirect.txt");
 		
 		System.out.println("Starting endPoints BruteForce.");
 		start = System.currentTimeMillis();
@@ -65,6 +68,7 @@ public class FirstOptimization {
 		System.out.println("Total time (endPointsFailBruteForce): " + totalTime);
 		System.out.println("Number of endPointsBruteForce: " + endPointsBruteForce.size());
 		System.out.println("Number of endPointsFailBruteForce: " + endPointsFailBruteForce.size());		
+		generateFile(endPointsBruteForce, "BruteForceEndPoints.txt");
 		
 		System.out.println("Trying recover possible redirects...BruteForce");
 		start = System.currentTimeMillis();
@@ -84,10 +88,6 @@ public class FirstOptimization {
 		System.out.println("Total time (EVERYTHING): " + totalTimeAll);
 		System.out.println("Now writing the files...");
 		
-		generateFile(endPointsGoodHTML, "goodHTML.txt");
-		generateFile(endPointsSparql, "spaqlEndPoints.txt");
-		generateFile(endPointsSparqlRedirect, "spaqlEndPointsRedirect.txt");
-		generateFile(endPointsBruteForce, "BruteForceEndPoints.txt");
 		generateFile(endPointsFailBruteForce, "FailBruteForceEndPoints.csv");
 		generateFile(endPointsFailRedirect, "FailRedirectEndPoints.csv");
 	}

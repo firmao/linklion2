@@ -13,7 +13,7 @@ public class CheckingEndpointsLeft {
 	}
 
 	public static void analyseLog() throws IOException{
-		File fLog = new File("log.txt");
+		File fLog = new File("log3.txt");
 		int totalTriples = QueryEndPoints.getLogEndpoints(fLog, "TotalNumberOfTriples: ");
 		Set<String> setLogEndpoints = QueryEndPoints.getLogEndpoints(fLog);
 		Set<String> setGoodEndPoints = QueryEndPoints.getGoodEndPoints();

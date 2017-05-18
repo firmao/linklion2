@@ -109,8 +109,10 @@ public class AnalyseComplexSparql {
 	public static ResultSet isGood(String endPoint) {
 		ResultSet result = null;
 
-		String sparqlQueryString = "select ?x (count(?z) as ?c) { ?x ?y ?z . \n "
-				+ "filter (datatype(?z) != '' || lang(?z) != '') } \n" + "group by ?x  \n";
+		String sparqlQueryString = "select ?x (count(?z) as ?c){?x ?y ?z . \n "
+				+ "filter (isliteral(?z))} group by ?x";
+		//String sparqlQueryString = "select ?x (count(?z) as ?c) { ?x ?y ?z . \n "
+		//		+ "filter (datatype(?z) != '' || lang(?z) != '') } \n" + "group by ?x  \n";
 
 		Query query = QueryFactory.create(sparqlQueryString);
 
@@ -136,7 +138,7 @@ public class AnalyseComplexSparql {
 		endpointsGoodHTML.parallelStream().forEach(endPoint -> {
 			try {
 				// TimeOut.analyseSparqlComplex(endPoint, 30);
-				ResultSet results = TimeOut.isGood(endPoint, 30);
+				ResultSet results = TimeOut.isGood(endPoint, 300);
 				if (results != null) {
 					DBUtil.setAutoCommit(false);
 					for (; results.hasNext();) {
