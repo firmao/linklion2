@@ -28,3 +28,7 @@ Backup Database:
 mysqldump -u root -p linklion2 > file.sql
 
 File with examples of URIs belonging to more than one data-set: https://github.com/firmao/linklion2/blob/master/data.csv
+
+# License
+
+licensed under Apache 2.0
