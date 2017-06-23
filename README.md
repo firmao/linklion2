@@ -32,3 +32,5 @@ File with examples of URIs belonging to more than one data-set: https://github.c
 # License
 
 licensed under Apache 2.0
+
+https://github.com/firmao/linklion2/blob/master/LICENSE.txt
